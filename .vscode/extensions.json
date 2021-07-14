@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    // Git
+    "eamodio.gitlens",
+    // JS
+    "coenraads.bracket-pair-colorizer",
+    "dbaeumer.vscode-eslint"
+  ]
+}
