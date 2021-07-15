@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import fs from "fs";
 import { load } from "cheerio";
-const cliProgress = require("cli-progress");
+import cliProgress from "cli-progress";
 
 import { ukuUrl, alphabet } from "./constants";
 import { getAllPassingPromises, getIncreamentingAxiosPages } from "./helpers";
@@ -20,19 +20,10 @@ interface ArtistData {
   songLinks: SongLinks[];
 }
 
-export const scrapeUku = async () => {
-  const artists: Artist[] = await getArtists();
-  // const artists = await getOneArtist();
+export const generateArtistsAndSongs = async () => {
+  // const artists: Artist[] = await getArtists();
+  const artists = await getOneArtist();
   const start = Date.now();
-  // fs.writeFile(
-  //   "artists.json",
-  //   JSON.stringify(artists, null, 2),
-  //   function (err: any) {
-  //     if (err) {
-  //       console.log(err);
-  //     }
-  //   }
-  // );
   const artistData = await getSongs(artists);
   fs.writeFile(
     "output/artistsSongs.json",
@@ -110,6 +101,7 @@ const getSongs = async (artists: Artist[]) => {
     });
     artistsData.push({ artist, songLinks: artistSongLinks });
   }
+  console.log("Artist finished!");
   bar1.stop();
   return artistsData;
 };

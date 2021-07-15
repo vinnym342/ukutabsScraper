@@ -1,10 +1,13 @@
 {
   "name": "scrape",
   "version": "1.0.0",
-  "main": "index.js",
+  "bin": {
+    "ukuscrape": "./dist/index.js"
+  },
   "author": "Vincent <vincent_marcos>",
   "licens e": "MIT",
   "devDependencies": {
+    "@types/cli-progress": "^3.9.2",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^15.14.1",
     "@typescript-eslint/eslint-plugin": "^4.28.3",
@@ -31,9 +34,15 @@
   "dependencies": {
     "@types/axios": "^0.14.0",
     "@types/cheerio": "^0.22.30",
+    "@types/clear": "^0.1.2",
+    "@types/figlet": "^1.5.4",
     "axios": "^0.21.1",
+    "chalk": "^4.1.1",
     "cheerio": "^1.0.0-rc.10",
+    "clear": "^0.1.0",
     "cli-progress": "^3.9.0",
-    "mongoose": "^5.13.2"
+    "commander": "^8.0.0",
+    "figlet": "^1.5.0",
+    "yargs": "^17.0.1"
   }
 }
