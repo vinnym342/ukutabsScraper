@@ -22,7 +22,7 @@ export const convertSongs = async () => {
         name: artistSongs.artist.name,
         link: artistSongs.artist.link
       });
-      const songPromises = artistSongs.songs.map((song) => {
+      const songPromises = artistSongs.songs.map((song: any) => {
         return new Song({ ...song, artist });
       });
       const songs = await Song.insertMany(songPromises);

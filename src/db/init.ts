@@ -34,10 +34,3 @@ export const runInMongo = (cb: Function) => {
     }
   });
 };
-
-export const closeMongo = () => {
-  const db = mongoose.connection;
-
-  db.close();
-  printAsciiArt("Mongo closed", true);
-};

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import { convertSongs } from "./db/createFromJson";
-import { startMongo, closeMongo, runInMongo } from "./db/init";
-import { generateArtistsAndSongs } from "./scrape";
+import { startMongo, runInMongo } from "./db/init";
+import { generateArtistsAndSongs, populateSongsWithTab } from "./scrape";
 
 const program = new Command();
 
@@ -12,14 +12,6 @@ program
   .description("Start mongodb")
   .action(() => {
     startMongo();
-  });
-
-program
-  .command("closeDB")
-  .alias("cdb")
-  .description("Close mongo connection")
-  .action(() => {
-    closeMongo();
   });
 
 program
@@ -38,6 +30,14 @@ program
   .description("insert artist song data from json, into mongodb record")
   .action(async () => {
     await runInMongo(convertSongs);
+  });
+
+program
+  .command("populate-songs")
+  .alias("ps")
+  .description("Get all songs in record and populate with pre")
+  .action(async () => {
+    await runInMongo(populateSongsWithTab);
   });
 
 program.parse(process.argv);

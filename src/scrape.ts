@@ -2,9 +2,12 @@ import axios, { AxiosResponse } from "axios";
 import fs from "fs";
 import { load } from "cheerio";
 import cliProgress from "cli-progress";
+import { FilterQuery, Document } from "mongoose";
 
 import { ukuUrl, alphabet } from "./constants";
 import { getAllPassingPromises, getIncreamentingAxiosPages } from "./helpers";
+import Song, { SongI } from "./db/models/song";
+import Chord, { ChordI } from "./db/models/chords";
 interface Artist {
   name: string;
   link: string;
@@ -104,4 +107,67 @@ const getSongs = async (artists: Artist[]) => {
   console.log("Artist finished!");
   bar1.stop();
   return artistsData;
+};
+
+const getChordDocuments = async (chordNames: string[]) => {
+  const chords: ChordI[] = [];
+  chordNames = [...new Set(chordNames)];
+  for (let i = 0; i < chordNames.length; i++) {
+    const chordName = chordNames[i];
+    const foundChord = await Chord.findOne({
+      name: chordName
+    } as FilterQuery<ChordI>);
+    if (foundChord) {
+      chords.push(foundChord);
+    } else {
+      const newChord = await Chord.create({
+        name: chordName
+      });
+      chords.push(newChord);
+    }
+  }
+  return chords;
+};
+
+const populateSong = async (song: SongI & Document<any, any, SongI>) => {
+  let page;
+  try {
+    page = await axios.get(song.link);
+  } catch {
+    console.log("Couldn't get");
+    throw Error();
+  }
+  const $ = load(page.data);
+  const pre = $("pre");
+  const aTags = pre.find("a");
+  aTags.removeAttr("target");
+  aTags.removeAttr("class");
+  aTags.removeAttr("href");
+  const foundChords: string[] = [];
+  aTags.each(async (i, aTag) => {
+    const chordName = $(aTag).text();
+    foundChords.push(chordName);
+  });
+  const chordDocuments = await getChordDocuments(foundChords);
+  song.chords = chordDocuments;
+  song.tabs = pre.html();
+  await song.save();
+};
+
+export const populateSongsWithTab = async () => {
+  const songs = await Song.find({});
+  const populateSongPromises: any = [];
+  const bar3 = new cliProgress.SingleBar(
+    {},
+    cliProgress.Presets.shades_classic
+  );
+
+  bar3.start(songs.length, 0);
+  for (let i = 0; i < songs.length; i++) {
+    const song = songs[i];
+    await populateSong(song);
+    bar3.increment(1);
+  }
+  console.log("DONE!");
+  bar3.stop();
 };
